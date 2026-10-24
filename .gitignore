@@ -42,3 +42,6 @@ GoogleService-Info.plist
 *.sqlite-*
 *.sqlite3
 backups/
+lib/l10n/app_localizations*.dart
+web/drift_worker.dart.js*
+web/sqlite3.wasm

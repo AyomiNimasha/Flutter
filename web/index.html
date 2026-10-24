@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="PawShots pet vaccination plans and records.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#195B6B">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="pawshots">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>PawShots</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; height: 100%; background: #E9F8FC; }
+    #startup { position: fixed; inset: 0; display: grid; place-items: center;
+      padding: 24px; color: #092F43; font: 18px/1.5 system-ui, sans-serif;
+      text-align: center; }
+    #startup h1 { margin: 0 0 12px; font-size: 32px; }
+    #startup p { max-width: 380px; }
+    #startup button { border: 0; border-radius: 24px; padding: 12px 28px;
+      background: #195B6B; color: white; font: inherit; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="startup" role="status" aria-live="polite">
+    <div><h1>PawShots</h1><p id="startup-message">Loading your pet workspace…</p>
+      <button id="startup-retry" hidden onclick="location.reload()">Try again</button>
+    </div>
+  </div>
+  <noscript>Enable JavaScript in your browser to open PawShots.</noscript>
+  <script>
+    window.pawshotsStartupError = function (error) {
+      console.error('PawShots startup failed:', error);
+      document.getElementById('startup-message').textContent =
+        'PawShots could not start. Reload this page. If it continues, check the browser console for details.';
+      document.getElementById('startup-retry').hidden = false;
+    };
+    window.addEventListener('flutter-first-frame', function () {
+      clearTimeout(window.pawshotsStartupTimer);
+      document.body.dataset.pawshotsReady = 'true';
+      document.getElementById('startup')?.remove();
+    });
+    window.pawshotsStartupTimer = setTimeout(function () {
+      if (document.getElementById('startup')) {
+        window.pawshotsStartupError(new Error('First frame did not render within 60 seconds'));
+      }
+    }, 60000);
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

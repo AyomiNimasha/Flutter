@@ -1,6 +1,6 @@
 # PawShots folder structure
 
-Current stage: folder structure only. Flutter initialization and working application code will be added later. This project is not runnable yet.
+Current stage: an Android Flutter local workspace, PostgreSQL migrations, and Docker development tooling are implemented. See [Flutter development](flutter_development.md) for implemented features, commands, and remaining API integration.
 
 - lib/config: dependency wiring
 - lib/routing: navigation
@@ -16,7 +16,7 @@ Current stage: folder structure only. Flutter initialization and working applica
 - docs: architecture decisions and data model
 - test: mirrors application layers and features
 
-Empty folders contain .gitkeep files so Git tracks them. Add lib/main.dart, lib/config/dependencies.dart, lib/routing/router.dart, lib/l10n/app_en.arb, and assets/data/vaccine_templates.json with their implementations later.
+Unused planned folders contain .gitkeep files. The current application uses MaterialPageRoute navigation and a shared WorkspaceViewModel; split routing and per-feature ViewModels as network-backed flows are added. Built-in vaccine template assets are not populated yet.
 
 Use MVVM with ChangeNotifier and ListenableBuilder. Views render ViewModel state. Repositories do not depend on one another; use cases coordinate shared logic. Wire dependencies in lib/config/dependencies.dart.
 

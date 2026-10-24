@@ -1,0 +1,83 @@
+name: pawshots
+
+services:
+  preview:
+    image: ghcr.io/cirruslabs/flutter:3.44.0
+    profiles: ["preview"]
+    working_dir: /workspace
+    environment:
+      PUB_CACHE: /pub-cache
+    volumes:
+      - .:/workspace:ro
+      - flutter_pub_cache:/pub-cache
+    ports:
+      - "127.0.0.1:8080:8080"
+    entrypoint: ["sh", "/workspace/tool/preview_web.sh"]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 10m
+
+  flutter:
+    image: ghcr.io/cirruslabs/flutter:3.44.0
+    profiles: ["flutter"]
+    working_dir: /workspace
+    environment:
+      PUB_CACHE: /pub-cache
+    volumes:
+      - .:/workspace
+      - flutter_pub_cache:/pub-cache
+      - flutter_gradle_cache:/root/.gradle
+      - flutter_android_sdk:/opt/android-sdk-linux
+      - flutter_android_home:/root/.android
+    entrypoint: ["flutter"]
+    command: ["--version"]
+
+  db:
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pawshots}
+      POSTGRES_USER: ${POSTGRES_USER:-pawshots}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env and set POSTGRES_PASSWORD}
+      TZ: UTC
+      PGTZ: UTC
+    command: ["postgres", "-c", "timezone=UTC"]
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  # One-off SQL client: shares the database network, not its data volume.
+  db-tools:
+    image: postgres:16-bookworm
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: ${POSTGRES_DB:-pawshots}
+      PGUSER: ${POSTGRES_USER:-pawshots}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env and set POSTGRES_PASSWORD}
+      PGCONNECT_TIMEOUT: "10"
+      PGTZ: UTC
+    volumes:
+      - ./backend/db:/sql:ro
+    entrypoint: ["psql", "-v", "ON_ERROR_STOP=1"]
+    command: ["--version"]
+
+volumes:
+  postgres_data:
+  flutter_pub_cache:
+  flutter_gradle_cache:
+  flutter_android_sdk:
+  flutter_android_home:
